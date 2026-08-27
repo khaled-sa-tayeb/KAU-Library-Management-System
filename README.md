@@ -1,4 +1,4 @@
-ر<div align="center">
+<div align="center">
   <h1>📚 KAU Library Management System</h1>
   <p><b>King Abdulaziz University - Database Course Project</b></p>
   <p>
@@ -22,9 +22,9 @@
 
 <h3>📂 Quick Links & Documentation</h3>
 <ul>
-  <li><b><a href="https://github.com/khaled-sa-tayeb/KAU-Advanced-Library-Management-System/blob/main/KAU%20Advanced%20Library%20Management%20System%20Report.pdf">Project Report (PDF):</a></b> Comprehensive documentation including requirements, ERD, and schema mapping.</li>
-  <li><b><a href="[https://github.com/khaled-sa-tayeb/KAU-Advanced-Library-Management-System/blob/main/UI%20Preview.pdf](https://github.com/khaled-sa-tayeb/KAU-Library-Management-System/blob/main/UI%20Preview.pdf)">UI Preview (PDF):</a></b> Screenshots and interface design of the dashboard.</li>
-  <li><b><a href="https://github.com/khaled-sa-tayeb/KAU-Advanced-Library-Management-System/blob/main/app.py">Source Code (app.py):</a></b> Main backend application and routing logic.</li>
+  <li><b><a href="https://github.com/khaled-sa-tayeb/KAU-Library-Management-System/blob/main/KAU%20Library%20Management%20System%20Report.pdf">Project Report (PDF):</a></b> Comprehensive documentation including requirements, ERD, and schema mapping.</li>
+  <li><b><a href="https://github.com/khaled-sa-tayeb/KAU-Library-Management-System/blob/main/UI%20Preview.pdf">UI Preview (PDF):</a></b> Screenshots and interface design of the dashboard.</li>
+  <li><b><a href="https://github.com/khaled-sa-tayeb/KAU-Library-Management-System/blob/main/app.py">Source Code (app.py):</a></b> Main backend application and routing logic.</li>
 </ul>
 
 <h3>🏛️ System Entities</h3>
