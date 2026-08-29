@@ -492,6 +492,22 @@ def employee_dashboard():
                 <div id="insertMessage" class="result" style="display: none;"></div>
             </div>
 
+            <!-- Return Book Panel -->
+            <div class="section-box">
+                <h3>🔄 Return Book (Update Loan Status)</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>Loan ID</label>
+                        <input type="number" id="return_loan_id" placeholder="e.g., 230524875">
+                    </div>
+                    <div>
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn-success" style="margin-top: 0;" onclick="submitReturnLoan()">Mark as Returned</button>
+                    </div>
+                </div>
+                <div id="returnMessage" class="result" style="display: none;"></div>
+            </div>
+
             <!-- Deletion Panel -->
             <div class="section-box">
                 <h3>🗑️ Delete Record</h3>
@@ -689,6 +705,34 @@ def employee_dashboard():
                 });
             }
 
+            function submitReturnLoan() {
+                const loanId = document.getElementById("return_loan_id").value;
+                const msgDiv = document.getElementById("returnMessage");
+
+                if (!loanId) {
+                    msgDiv.style.display = "block";
+                    msgDiv.className = "result error-msg";
+                    msgDiv.innerText = "Please enter a Loan ID.";
+                    return;
+                }
+
+                fetch(`/loans/${loanId}/return`, { method: "PUT" })
+                .then(async res => {
+                    const resJson = await res.json();
+                    msgDiv.style.display = "block";
+                    if (res.ok) {
+                        msgDiv.className = "result success-msg";
+                        msgDiv.innerText = resJson.message;
+                        document.getElementById("return_loan_id").value = "";
+                        loadActivities();
+                        executeAdvancedQuery();
+                    } else {
+                        msgDiv.className = "result error-msg";
+                        msgDiv.innerText = "Return failed: " + (resJson.detail || "Loan not found.");
+                    }
+                });
+            }
+
             function loadActivities() {
                 fetch("/activities")
                 .then(res => res.json())
@@ -796,16 +840,49 @@ def add_employee(item: Employee):
     recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Added employee: {item.employee_name}"})
     return item
 
+def get_active_loan_ids():
+    """يرجع كل loan_id اللي حالتها Active (لسه ما رجعت) من جدول Loan History."""
+    return {h["loan_id"] for h in fake_loan_history_db if h["return_status"] == "Active"}
+
 @app.post("/loans", response_model=Loan)
 def add_loan(item: Loan):
+    active_loan_ids = get_active_loan_ids()
+
+    active_loans_for_student = [
+        l for l in fake_loans_db
+        if l["student_id"] == item.student_id and l["loan_id"] in active_loan_ids
+    ]
+    if len(active_loans_for_student) >= 3:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Student {item.student_id} already has {len(active_loans_for_student)} active loans. Max allowed is 3."
+        )
+
+    active_loans_for_book = [
+        l for l in fake_loans_db
+        if l["book_id"] == item.book_id and l["loan_id"] in active_loan_ids
+    ]
+    if active_loans_for_book:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Book {item.book_id} is currently on loan and not available."
+        )
+
     if not item.loan_id:
         max_id = max([l["loan_id"] for l in fake_loans_db], default=230400000)
         item.loan_id = max_id + 1
 
     if any(l["loan_id"] == item.loan_id for l in fake_loans_db):
         raise HTTPException(status_code=400, detail="Loan ID already exists.")
-    
+
     fake_loans_db.append(item.dict())
+
+    fake_loan_history_db.append({
+        "loan_id": item.loan_id,
+        "book_id": item.book_id,
+        "return_status": "Active"
+    })
+
     recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Added auto-generated loan ID: {item.loan_id}"})
     return item
 
@@ -883,6 +960,20 @@ def delete_loan(loan_id: int):
             recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Deleted loan ID: {loan_id}"})
             return {"message": f"Loan record {loan_id} deleted successfully."}
     raise HTTPException(status_code=404, detail="Loan record not found.")
+
+@app.put("/loans/{loan_id}/return")
+def return_loan(loan_id: int):
+
+    history_record = next((h for h in fake_loan_history_db if h["loan_id"] == loan_id), None)
+    if not history_record:
+        raise HTTPException(status_code=404, detail="Loan history record not found.")
+
+    if history_record["return_status"] == "Returned":
+        raise HTTPException(status_code=400, detail="This loan is already marked as returned.")
+
+    history_record["return_status"] = "Returned"
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Book returned for loan ID: {loan_id}"})
+    return {"message": f"Loan {loan_id} marked as returned successfully.", "loan_id": loan_id, "return_status": "Returned"}
 
 @app.delete("/authors_list/{book_id}")
 def delete_author(book_id: int):
