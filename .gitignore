@@ -1,0 +1,13 @@
+# Database (auto-created on first run, don't version the data file)
+library.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
