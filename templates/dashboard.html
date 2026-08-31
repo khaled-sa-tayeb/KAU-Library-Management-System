@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAU Advanced Library Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         :root {
             --primary: #0f172a;
@@ -272,6 +273,26 @@
             .header-banner { flex-direction: column; }
             .browse-toolbar { flex-direction: column; align-items: stretch; }
         }
+
+        /* ===== Lucide Icons ===== */
+        .lucide { width: 18px; height: 18px; stroke-width: 2.2; vertical-align: -4px; flex-shrink: 0; }
+        h1 .lucide { width: 26px; height: 26px; vertical-align: -5px; margin-left: 8px; color: var(--accent); }
+        .section-box h3 .lucide { width: 20px; height: 20px; color: var(--accent); }
+        .mode-tab .lucide { width: 16px; height: 16px; margin-left: 6px; }
+        .table-icon .lucide { width: 26px; height: 26px; color: var(--primary); }
+        .icon-btn .lucide { width: 19px; height: 19px; }
+        .row-action-btn .lucide { width: 14px; height: 14px; }
+        .modal-header h3 .lucide { width: 19px; height: 19px; margin-left: 6px; }
+        .modal-close .lucide { width: 16px; height: 16px; vertical-align: -3px; }
+        button .lucide { margin-left: 6px; }
+        .activity-log .lucide { width: 14px; height: 14px; margin-left: 4px; color: var(--accent); }
+
+        .browse-search { position: relative; flex: 1; min-width: 180px; }
+        .browse-search input { padding-right: 40px; margin: 0; }
+        .browse-search .search-icon {
+            position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+            color: var(--text-muted); pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -280,25 +301,25 @@
         <div class="header-banner">
             <img src="/static/kau-logo.png" alt="King Abdulaziz University Logo" class="logo">
             <div>
-                <h1>📚 KAU Advanced Library Management System</h1>
+                <h1><i data-lucide="library"></i> KAU Advanced Library Management System</h1>
                 <p>King Abdulaziz University - Central Library Enterprise Dashboard &middot; Backed by a real SQLite database</p>
             </div>
         </div>
 
         <!-- Box 1: Activity Log -->
         <div class="section-box">
-            <h3>📋 System Activity Log</h3>
+            <h3><i data-lucide="clipboard-list"></i> System Activity Log</h3>
             <div id="activityLogBox" class="activity-log">Loading logs...</div>
-            <button type="button" class="btn-warning" onclick="loadActivities()" style="width: auto; padding: 6px 14px; margin-top: 10px;">Refresh Log</button>
+            <button type="button" class="btn-warning" onclick="loadActivities()" style="width: auto; padding: 6px 14px; margin-top: 10px;"><i data-lucide="refresh-cw"></i> Refresh Log</button>
         </div>
 
         <!-- Box 2: Data Explorer (Filter Mode + Browse & Manage Mode) -->
         <div class="section-box">
-            <h3>⚙️ Data Explorer</h3>
+            <h3><i data-lucide="database"></i> Data Explorer</h3>
 
             <div class="mode-tabs">
-                <button type="button" class="mode-tab" id="tabFilterBtn" onclick="switchMode('filter')">🔍 Filter Mode</button>
-                <button type="button" class="mode-tab active" id="tabBrowseBtn" onclick="switchMode('browse')">🗂️ Browse &amp; Manage</button>
+                <button type="button" class="mode-tab" id="tabFilterBtn" onclick="switchMode('filter')"><i data-lucide="filter"></i> Filter Mode</button>
+                <button type="button" class="mode-tab active" id="tabBrowseBtn" onclick="switchMode('browse')"><i data-lucide="table"></i> Browse &amp; Manage</button>
             </div>
 
             <!-- ===== Filter Mode Panel ===== -->
@@ -345,7 +366,7 @@
                     </div>
                     <div>
                         <label>&nbsp;</label>
-                        <button type="button" class="btn-success" style="margin-top: 0;" onclick="executeAdvancedQuery()">Apply Filter 🔍</button>
+                        <button type="button" class="btn-success" style="margin-top: 0;" onclick="executeAdvancedQuery()">Apply Filter <i data-lucide="search"></i></button>
                     </div>
                 </div>
 
@@ -361,7 +382,7 @@
             <div id="browseModePanel">
                 <div class="browse-toolbar">
                     <div class="browse-table-select">
-                        <span id="browseTableIcon" class="table-icon">🎓</span>
+                        <span id="browseTableIcon" class="table-icon"><i data-lucide="graduation-cap"></i></span>
                         <select id="browseTarget" onchange="onBrowseTableChange()">
                             <option value="students">Students</option>
                             <option value="books">Books</option>
@@ -375,13 +396,14 @@
                         </select>
                     </div>
                     <div class="browse-search">
-                        <input type="text" id="browseSearch" placeholder="🔍 Search this table..." oninput="renderBrowseTable()">
+                        <span class="search-icon"><i data-lucide="search"></i></span>
+                        <input type="text" id="browseSearch" placeholder="Search this table..." oninput="renderBrowseTable()">
                     </div>
                     <div class="browse-actions">
-                        <button type="button" class="icon-btn" title="Export full database to Excel" onclick="downloadExport()">📤</button>
-                        <button type="button" class="icon-btn" title="Import records from Excel" onclick="triggerImportFile()">📥</button>
+                        <button type="button" class="icon-btn" title="Export full database to Excel" onclick="downloadExport()"><i data-lucide="download"></i></button>
+                        <button type="button" class="icon-btn" title="Import records from Excel" onclick="triggerImportFile()"><i data-lucide="upload"></i></button>
                         <input type="file" id="browseImportFile" accept=".xlsx" style="display:none;" onchange="handleImportFileChosen()">
-                        <button type="button" class="icon-btn btn-add" title="Add new record" onclick="openAddModal()">➕</button>
+                        <button type="button" class="icon-btn btn-add" title="Add new record" onclick="openAddModal()"><i data-lucide="plus"></i></button>
                     </div>
                 </div>
 
@@ -404,11 +426,11 @@
         <div class="modal-box">
             <div class="modal-header">
                 <h3 id="modalTitle">Add Record</h3>
-                <button type="button" class="modal-close" onclick="closeModal()">✕</button>
+                <button type="button" class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
             <div id="modalFormFields" class="grid-2"></div>
             <div id="modalMessage" class="result" style="display:none;"></div>
-            <button type="button" class="btn-success" onclick="submitModalForm()">💾 Save Record</button>
+            <button type="button" class="btn-success" onclick="submitModalForm()"><i data-lucide="save"></i> Save Record</button>
         </div>
     </div>
 
@@ -437,15 +459,15 @@
         };
 
         const tableIcons = {
-            "students": "🎓",
-            "books": "📘",
-            "employees": "🧑‍💼",
-            "loans": "📖",
-            "genres": "🏷️",
-            "bookshelves": "📚",
-            "sections": "🏛️",
-            "loan_history": "🧾",
-            "authors_list": "✍️"
+            "students": "graduation-cap",
+            "books": "book",
+            "employees": "briefcase",
+            "loans": "book-open",
+            "genres": "tag",
+            "bookshelves": "library",
+            "sections": "landmark",
+            "loan_history": "receipt",
+            "authors_list": "pen-line"
         };
 
         let currentBrowseData = [];
@@ -454,6 +476,7 @@
         let modalEditId = null;
 
         window.onload = function() {
+            renderLucide();
             switchMode('browse');
             loadActivities();
         };
@@ -540,7 +563,9 @@
         /* ===================== Browse & Manage Mode ===================== */
         function onBrowseTableChange() {
             const target = document.getElementById("browseTarget").value;
-            document.getElementById("browseTableIcon").textContent = tableIcons[target] || "📄";
+            const iconName = tableIcons[target] || "file";
+            document.getElementById("browseTableIcon").innerHTML = `<i data-lucide="${iconName}"></i>`;
+            renderLucide();
             document.getElementById("browseSearch").value = "";
             loadBrowseData();
         }
@@ -605,17 +630,19 @@
 
                 let actions = "";
                 if (target === "loans" && row.return_status === "Active") {
-                    actions += `<button type="button" class="row-action-btn row-return" title="Mark as Returned" onclick="toggleLoanStatus(${row.loan_id})">↩️</button>`;
+                    actions += `<button type="button" class="row-action-btn row-return" title="Mark as Returned" onclick="toggleLoanStatus(${row.loan_id})"><i data-lucide="undo-2"></i></button>`;
                 }
                 if (canEdit) {
-                    actions += `<button type="button" class="row-action-btn row-edit" title="Edit" onclick="openEditModal('${target}', ${row[pk]})">✏️</button>`;
+                    actions += `<button type="button" class="row-action-btn row-edit" title="Edit" onclick="openEditModal('${target}', ${row[pk]})"><i data-lucide="pencil"></i></button>`;
                 }
                 const deleteId = target === "authors_list" || target === "loan_history" ? row.book_id ?? row.loan_id : row[pk || Object.keys(row)[0]];
-                actions += `<button type="button" class="row-action-btn row-delete" title="Delete" onclick="deleteBrowseRow('${target}', ${target === 'loan_history' ? row.loan_id : (pk ? row[pk] : row.book_id)})">🗑️</button>`;
+                actions += `<button type="button" class="row-action-btn row-delete" title="Delete" onclick="deleteBrowseRow('${target}', ${target === 'loan_history' ? row.loan_id : (pk ? row[pk] : row.book_id)})"><i data-lucide="trash-2"></i></button>`;
 
                 tr += `<td>${actions}</td></tr>`;
                 tbody.innerHTML += tr;
             });
+
+            renderLucide();
         }
 
         function escapeHtml(str) {
@@ -692,7 +719,7 @@
             modalTable = target;
             modalEditId = null;
 
-            document.getElementById("modalTitle").textContent = `➕ Add New ${target.replace('_', ' ')}`;
+            document.getElementById("modalTitle").innerHTML = `<i data-lucide="plus-circle"></i> Add New ${target.replace('_', ' ')}`;
             document.getElementById("modalMessage").style.display = "none";
 
             let fields = tableFields[target];
@@ -718,6 +745,7 @@
             });
 
             document.getElementById("recordModal").style.display = "flex";
+            renderLucide();
         }
 
         function openEditModal(table, id) {
@@ -729,7 +757,7 @@
             modalTable = table;
             modalEditId = id;
 
-            document.getElementById("modalTitle").textContent = `✏️ Edit ${table.replace('_', ' ')} — ${pk}: ${id}`;
+            document.getElementById("modalTitle").innerHTML = `<i data-lucide="pencil"></i> Edit ${table.replace('_', ' ')} — ${pk}: ${id}`;
             document.getElementById("modalMessage").style.display = "none";
 
             const fields = tableFields[table];
@@ -748,6 +776,7 @@
             });
 
             document.getElementById("recordModal").style.display = "flex";
+            renderLucide();
         }
 
         function closeModal() {
@@ -804,9 +833,14 @@
                 const logBox = document.getElementById("activityLogBox");
                 logBox.innerHTML = "";
                 data.slice().reverse().forEach(act => {
-                    logBox.innerHTML += `<div>⏱️ [${act.time}] - ${act.action}</div>`;
+                    logBox.innerHTML += `<div><i data-lucide="clock"></i>[${act.time}] - ${act.action}</div>`;
                 });
+                renderLucide();
             });
+        }
+
+        function renderLucide() {
+            if (window.lucide) { lucide.createIcons(); }
         }
     </script>
 </body>
