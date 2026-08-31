@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAU Advanced Library Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,7 +15,7 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --bg-main: #f1f5f9;
-            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-bg: rgba(255, 255, 255, 0.94);
             --text-main: #334155;
             --text-muted: #64748b;
             --border-color: #cbd5e1;
@@ -23,35 +24,46 @@
             --transition: all 0.3s ease;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), 
-                        url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background: linear-gradient(rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.88)),
+                        url('/static/library-bg.jpg') no-repeat center center fixed;
             background-size: cover;
             color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
+        .container { max-width: 1200px; margin: auto; }
 
         .header-banner {
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
             color: white;
-            padding: 35px 40px;
+            padding: 30px 40px;
             border-radius: var(--radius);
-            text-align: center;
             margin-bottom: 30px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .header-banner img.logo {
+            height: 78px;
+            width: auto;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+            flex-shrink: 0;
         }
 
         .header-banner h1 {
-            margin: 0 0 10px 0;
-            font-size: 30px;
+            margin: 0 0 8px 0;
+            font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
@@ -59,7 +71,7 @@
         .header-banner p {
             margin: 0;
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
         .section-box {
@@ -70,12 +82,6 @@
             margin-bottom: 25px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .section-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15);
         }
 
         .section-box h3 {
@@ -91,11 +97,7 @@
             padding-bottom: 12px;
         }
 
-        .hint {
-            margin: -12px 0 16px 0;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .hint { margin: -12px 0 16px 0; font-size: 12px; color: var(--text-muted); }
 
         label {
             display: block;
@@ -124,7 +126,6 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
-            background-color: #ffffff;
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
@@ -143,273 +144,275 @@
             transition: var(--transition);
             box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
         }
-
-        button:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-1px);
-        }
+        button:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
 
         .btn-success { background-color: var(--success); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
         .btn-success:hover { background-color: #059669; }
-
         .btn-danger { background-color: var(--danger); box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2); }
         .btn-danger:hover { background-color: #dc2626; }
-
         .btn-warning { background-color: var(--warning); box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2); }
         .btn-warning:hover { background-color: #d97706; }
 
         .result {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            text-align: center;
+            margin-top: 15px; padding: 12px; border-radius: 8px;
+            font-weight: 600; font-size: 13px; text-align: center;
         }
         .success-msg { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .error-msg { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
         .table-container {
-            max-height: 280px;
-            overflow-y: auto;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: white;
+            max-height: 400px; overflow-y: auto; margin-top: 15px;
+            border: 1px solid var(--border-color); border-radius: 8px; background: white;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
         th {
-            background-color: #f8fafc;
-            color: var(--primary);
-            font-weight: 700;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background-color: #f8fafc; color: var(--primary); font-weight: 700;
+            position: sticky; top: 0; z-index: 10;
         }
-
-        tr:hover td {
-            background-color: #f1f5f9;
-        }
+        tr:hover td { background-color: #f1f5f9; }
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; }
 
         .activity-log {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            max-height: 130px;
-            overflow-y: auto;
-            font-family: monospace;
+            background: #ffffff; border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 12px; border-radius: 8px; font-size: 13px; max-height: 130px;
+            overflow-y: auto; font-family: monospace;
         }
-        
+
         .sub-panel {
-            background: rgba(241, 245, 249, 0.7);
-            padding: 18px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-top: 15px;
+            background: rgba(241, 245, 249, 0.7); padding: 18px; border-radius: 8px;
+            border: 1px solid var(--border-color); margin-top: 15px;
+        }
+
+        /* ===== Mode Tabs ===== */
+        .mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .mode-tab {
+            width: auto; flex: 1; margin-top: 0;
+            background: #e2e8f0; color: var(--text-muted);
+            box-shadow: none; font-size: 14px;
+        }
+        .mode-tab:hover { background: #cbd5e1; transform: none; }
+        .mode-tab.active { background: var(--primary); color: white; }
+        .mode-tab.active:hover { background: var(--primary-light); }
+
+        /* ===== Browse Toolbar ===== */
+        .browse-toolbar {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: rgba(241, 245, 249, 0.7); padding: 14px 16px; border-radius: 10px;
+            border: 1px solid var(--border-color); margin-bottom: 4px;
+        }
+        .browse-table-select { display: flex; align-items: center; gap: 8px; min-width: 200px; }
+        .table-icon { font-size: 24px; line-height: 1; flex-shrink: 0; }
+        .browse-table-select select { margin: 0; }
+        .browse-search { flex: 1; min-width: 180px; }
+        .browse-search input { margin: 0; }
+        .browse-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            width: 42px; height: 42px; padding: 0; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 19px; border-radius: 8px; flex-shrink: 0;
+            background: white; color: var(--primary); border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+        .icon-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+        .icon-btn.btn-add { background: var(--success); color: white; border-color: var(--success); }
+        .icon-btn.btn-add:hover { background: #059669; }
+
+        .row-action-btn {
+            width: 30px; height: 30px; padding: 0; margin: 0 2px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 14px; border-radius: 6px; box-shadow: none;
+        }
+        .row-edit { background: #e0f2fe; color: #0369a1; }
+        .row-edit:hover { background: #bae6fd; }
+        .row-delete { background: #fee2e2; color: #b91c1c; }
+        .row-delete:hover { background: #fecaca; }
+        .row-return { background: #d1fae5; color: #047857; }
+        .row-return:hover { background: #a7f3d0; }
+
+        .status-chip {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+        }
+        .status-active { background: #fef3c7; color: #92400e; }
+        .status-returned { background: #d1fae5; color: #065f46; }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px; backdrop-filter: blur(3px);
+        }
+        .modal-box {
+            background: white; border-radius: var(--radius); padding: 28px 30px;
+            max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; color: var(--primary); font-size: 19px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; padding: 0; margin: 0; border-radius: 50%;
+            background: #f1f5f9; color: var(--text-main); font-size: 16px; box-shadow: none;
+        }
+        .modal-close:hover { background: #e2e8f0; }
+
+        footer {
+            text-align: center; color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 10px;
+        }
+
+        @media (max-width: 720px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .header-banner { flex-direction: column; }
+            .browse-toolbar { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Banner (No Logo) -->
+
         <div class="header-banner">
-            <h1>📚 KAU Advanced Library Management System</h1>
-            <p>King Abdulaziz University - Central Library Enterprise Dashboard &middot; Backed by a real SQLite database</p>
+            <img src="/static/kau-logo.png" alt="King Abdulaziz University Logo" class="logo">
+            <div>
+                <h1>📚 KAU Advanced Library Management System</h1>
+                <p>King Abdulaziz University - Central Library Enterprise Dashboard &middot; Backed by a real SQLite database</p>
+            </div>
         </div>
 
-        <!-- Activity Log Section -->
+        <!-- Box 1: Activity Log -->
         <div class="section-box">
             <h3>📋 System Activity Log</h3>
             <div id="activityLogBox" class="activity-log">Loading logs...</div>
             <button type="button" class="btn-warning" onclick="loadActivities()" style="width: auto; padding: 6px 14px; margin-top: 10px;">Refresh Log</button>
         </div>
 
-        <!-- Advanced Query & Filter Hub -->
+        <!-- Box 2: Data Explorer (Filter Mode + Browse & Manage Mode) -->
         <div class="section-box">
-            <h3>⚙️ Advanced Query & Filter Hub</h3>
-            
-            <div class="grid-2">
-                <div>
-                    <label>Target Table</label>
-                    <select id="queryTarget" onchange="onTargetTableChange()">
-                        <option value="students">Students</option>
-                        <option value="books">Books</option>
-                        <option value="employees">Employees</option>
-                        <option value="loans">Loans</option>
-                        <option value="genres">Genres</option>
-                        <option value="bookshelves">Bookshelves</option>
-                        <option value="sections">Sections</option>
-                        <option value="loan_history">Loan History</option>
-                        <option value="authors_list">Authors List</option>
-                    </select>
+            <h3>⚙️ Data Explorer</h3>
+
+            <div class="mode-tabs">
+                <button type="button" class="mode-tab" id="tabFilterBtn" onclick="switchMode('filter')">🔍 Filter Mode</button>
+                <button type="button" class="mode-tab active" id="tabBrowseBtn" onclick="switchMode('browse')">🗂️ Browse &amp; Manage</button>
+            </div>
+
+            <!-- ===== Filter Mode Panel ===== -->
+            <div id="filterModePanel" style="display:none;">
+                <div class="grid-2">
+                    <div>
+                        <label>Target Table</label>
+                        <select id="queryTarget" onchange="onTargetTableChange()">
+                            <option value="students">Students</option>
+                            <option value="books">Books</option>
+                            <option value="employees">Employees</option>
+                            <option value="loans">Loans</option>
+                            <option value="genres">Genres</option>
+                            <option value="bookshelves">Bookshelves</option>
+                            <option value="sections">Sections</option>
+                            <option value="loan_history">Loan History</option>
+                            <option value="authors_list">Authors List</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>&nbsp;</label>
+                        <button type="button" style="margin-top: 0;" onclick="executeAdvancedQuery()">Reset Filter &amp; View All</button>
+                    </div>
                 </div>
-                <div>
-                    <label>&nbsp;</label>
-                    <button type="button" style="margin-top: 0;" onclick="executeAdvancedQuery()">Reset Filter & View All</button>
+
+                <div class="grid-4 sub-panel">
+                    <div>
+                        <label>Field</label>
+                        <select id="queryField"></select>
+                    </div>
+                    <div>
+                        <label>Operator</label>
+                        <select id="queryOperator">
+                            <option value="equals">Equals (=)</option>
+                            <option value="not_equals">Not Equals (!=)</option>
+                            <option value="greater_than">Greater Than (&gt;)</option>
+                            <option value="less_than">Less Than (&lt;)</option>
+                            <option value="contains">Contains</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Value</label>
+                        <input type="text" id="queryValue" placeholder="Enter value...">
+                    </div>
+                    <div>
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn-success" style="margin-top: 0;" onclick="executeAdvancedQuery()">Apply Filter 🔍</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="queryTable">
+                        <thead><tr id="queryHeaders"><th>Data</th></tr></thead>
+                        <tbody id="queryBody"><tr><td>Table data will appear here...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="grid-4 sub-panel">
-                <div>
-                    <label>Field</label>
-                    <select id="queryField"></select>
+            <!-- ===== Browse & Manage Mode Panel ===== -->
+            <div id="browseModePanel">
+                <div class="browse-toolbar">
+                    <div class="browse-table-select">
+                        <span id="browseTableIcon" class="table-icon">🎓</span>
+                        <select id="browseTarget" onchange="onBrowseTableChange()">
+                            <option value="students">Students</option>
+                            <option value="books">Books</option>
+                            <option value="employees">Employees</option>
+                            <option value="loans">Loans</option>
+                            <option value="genres">Genres</option>
+                            <option value="bookshelves">Bookshelves</option>
+                            <option value="sections">Sections</option>
+                            <option value="loan_history">Loan History</option>
+                            <option value="authors_list">Authors List</option>
+                        </select>
+                    </div>
+                    <div class="browse-search">
+                        <input type="text" id="browseSearch" placeholder="🔍 Search this table..." oninput="renderBrowseTable()">
+                    </div>
+                    <div class="browse-actions">
+                        <button type="button" class="icon-btn" title="Export full database to Excel" onclick="downloadExport()">📤</button>
+                        <button type="button" class="icon-btn" title="Import records from Excel" onclick="triggerImportFile()">📥</button>
+                        <input type="file" id="browseImportFile" accept=".xlsx" style="display:none;" onchange="handleImportFileChosen()">
+                        <button type="button" class="icon-btn btn-add" title="Add new record" onclick="openAddModal()">➕</button>
+                    </div>
                 </div>
-                <div>
-                    <label>Operator</label>
-                    <select id="queryOperator">
-                        <option value="equals">Equals (=)</option>
-                        <option value="not_equals">Not Equals (!=)</option>
-                        <option value="greater_than">Greater Than (&gt;)</option>
-                        <option value="less_than">Less Than (&lt;)</option>
-                        <option value="contains">Contains</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Value</label>
-                    <input type="text" id="queryValue" placeholder="Enter value...">
-                </div>
-                <div>
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn-success" style="margin-top: 0;" onclick="executeAdvancedQuery()">Apply Filter 🔍</button>
-                </div>
-            </div>
 
-            <div class="table-container">
-                <table id="queryTable">
-                    <thead><tr id="queryHeaders"><th>Data</th></tr></thead>
-                    <tbody id="queryBody"><tr><td>Table data will appear here...</td></tr></tbody>
-                </table>
+                <div id="browseMessage" class="result" style="display: none;"></div>
+
+                <div class="table-container">
+                    <table id="browseTable">
+                        <thead><tr id="browseHeaders"></tr></thead>
+                        <tbody id="browseBody"><tr><td>Loading...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- New Loan Registration (Auto Loan ID) -->
-        <div class="section-box">
-            <h3>📖 Register New Loan (Auto-Generated Loan ID)</h3>
-            <p class="hint">Business rules enforced automatically: max 3 active loans per student &middot; book must be available &middot; loan duration ≤ 14 days.</p>
-            <div class="grid-3">
-                <div>
-                    <label>Student ID</label>
-                    <input type="number" id="loan_student_id" placeholder="e.g., 2245343">
-                </div>
-                <div>
-                    <label>Employee ID</label>
-                    <input type="number" id="loan_employee_id" placeholder="e.g., 168112">
-                </div>
-                <div>
-                    <label>Book ID</label>
-                    <input type="number" id="loan_book_id" placeholder="e.g., 12034">
-                </div>
-            </div>
-            <div class="grid-2" style="margin-top: 5px;">
-                <div>
-                    <label>Loan Date</label>
-                    <input type="date" id="loan_date">
-                </div>
-                <div>
-                    <label>Due Date</label>
-                    <input type="date" id="due_date">
-                </div>
-            </div>
-            <button type="button" class="btn-success" onclick="submitNewLoan()">Confirm & Create Loan Automatically</button>
-            <div id="loanMessage" class="result" style="display: none;"></div>
-        </div>
+        <footer>KAU Central Library &middot; FastAPI + SQLite &middot; Live System</footer>
+    </div>
 
-        <!-- Generic Insert Section -->
-        <div class="section-box">
-            <h3>➕ Generic Record Insertion</h3>
-            <div class="grid-2">
-                <div>
-                    <label>Target Section</label>
-                    <select id="insertTarget" onchange="renderInsertForm()">
-                        <option value="students">Add New Student</option>
-                        <option value="books">Add New Book</option>
-                        <option value="employees">Add New Employee</option>
-                        <option value="genres">Add New Genre</option>
-                        <option value="bookshelves">Add New Bookshelf</option>
-                        <option value="sections">Add New Section</option>
-                        <option value="loan_history">Add Loan History</option>
-                        <option value="authors_list">Add Book Author</option>
-                    </select>
-                </div>
-                <div>
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn-success" style="margin-top: 0;" onclick="submitGenericInsert()">Save Record</button>
-                </div>
+    <!-- ===== Add / Edit Record Modal ===== -->
+    <div id="recordModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Record</h3>
+                <button type="button" class="modal-close" onclick="closeModal()">✕</button>
             </div>
-            <div id="dynamicFormFields" class="grid-3 sub-panel"></div>
-            <div id="insertMessage" class="result" style="display: none;"></div>
-        </div>
-
-        <!-- Return Book Panel -->
-        <div class="section-box">
-            <h3>🔄 Return Book (Update Loan Status)</h3>
-            <div class="grid-2">
-                <div>
-                    <label>Loan ID</label>
-                    <input type="number" id="return_loan_id" placeholder="e.g., 230524875">
-                </div>
-                <div>
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn-success" style="margin-top: 0;" onclick="submitReturnLoan()">Mark as Returned</button>
-                </div>
-            </div>
-            <div id="returnMessage" class="result" style="display: none;"></div>
-        </div>
-
-        <!-- Deletion Panel -->
-        <div class="section-box">
-            <h3>🗑️ Delete Record</h3>
-            <div class="grid-2">
-                <div>
-                    <label>Target Table</label>
-                    <select id="deleteTarget">
-                        <option value="students">Student (Student ID)</option>
-                        <option value="books">Book (Book ID)</option>
-                        <option value="employees">Employee (Employee ID)</option>
-                        <option value="loans">Loan (Loan ID)</option>
-                        <option value="authors_list">Author (Book ID)</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Enter Identifier (ID)</label>
-                    <input type="number" id="deleteId" placeholder="e.g., 2245343">
-                </div>
-            </div>
-            <button type="button" class="btn-danger" onclick="executeDelete()">Permanently Delete Record</button>
-            <div id="deleteMessage" class="result" style="display: none;"></div>
+            <div id="modalFormFields" class="grid-2"></div>
+            <div id="modalMessage" class="result" style="display:none;"></div>
+            <button type="button" class="btn-success" onclick="submitModalForm()">💾 Save Record</button>
         </div>
     </div>
 
     <script>
-        window.onload = function() {
-            onTargetTableChange();
-            loadActivities();
-            renderInsertForm();
-            document.getElementById('loan_date').valueAsDate = new Date();
-            let nextWeek = new Date();
-            nextWeek.setDate(nextWeek.getDate() + 14);
-            document.getElementById('due_date').valueAsDate = nextWeek;
-        };
-
         const tableFields = {
             "students": ["student_id", "student_name", "phone_no", "degree", "email", "age"],
             "books": ["book_id", "book_name", "isbn", "edition", "genre_code", "bookshelf_id"],
@@ -422,15 +425,61 @@
             "authors_list": ["book_id", "author_name"]
         };
 
+        // الجداول ذات مفتاح أساسي مفرد (تدعم تعديل)، مع اسم عمود المفتاح
+        const primaryKeys = {
+            "students": "student_id",
+            "books": "book_id",
+            "employees": "employee_id",
+            "loans": "loan_id",
+            "genres": "genre_code",
+            "bookshelves": "bookshelf_id",
+            "sections": "section_id"
+        };
+
+        const tableIcons = {
+            "students": "🎓",
+            "books": "📘",
+            "employees": "🧑‍💼",
+            "loans": "📖",
+            "genres": "🏷️",
+            "bookshelves": "📚",
+            "sections": "🏛️",
+            "loan_history": "🧾",
+            "authors_list": "✍️"
+        };
+
+        let currentBrowseData = [];
+        let modalMode = "add";     // "add" | "edit"
+        let modalTable = null;
+        let modalEditId = null;
+
+        window.onload = function() {
+            switchMode('browse');
+            loadActivities();
+        };
+
+        /* ===================== Mode Switching ===================== */
+        function switchMode(mode) {
+            document.getElementById("filterModePanel").style.display = mode === "filter" ? "block" : "none";
+            document.getElementById("browseModePanel").style.display = mode === "browse" ? "block" : "none";
+            document.getElementById("tabFilterBtn").classList.toggle("active", mode === "filter");
+            document.getElementById("tabBrowseBtn").classList.toggle("active", mode === "browse");
+
+            if (mode === "filter") {
+                onTargetTableChange();
+            } else {
+                onBrowseTableChange();
+            }
+        }
+
+        /* ===================== Filter Mode (original behavior) ===================== */
         function onTargetTableChange() {
             const target = document.getElementById("queryTarget").value;
             const fieldSelect = document.getElementById("queryField");
             fieldSelect.innerHTML = "";
-            
             tableFields[target].forEach(f => {
                 fieldSelect.innerHTML += `<option value="${f}">${f}</option>`;
             });
-            
             executeAdvancedQuery();
         }
 
@@ -445,7 +494,6 @@
             .then(data => {
                 let filtered = data.filter(row => {
                     if (!rawVal) return true;
-
                     let cellVal = row[field];
                     if (cellVal === undefined || cellVal === null) return false;
 
@@ -480,7 +528,6 @@
 
                 const keys = Object.keys(filtered[0]);
                 keys.forEach(k => thead.innerHTML += `<th>${k}</th>`);
-
                 filtered.forEach(row => {
                     let tr = "<tr>";
                     keys.forEach(k => tr += `<td>${row[k] !== null ? row[k] : ''}</td>`);
@@ -490,39 +537,246 @@
             });
         }
 
-        function renderInsertForm() {
-            const target = document.getElementById("insertTarget").value;
-            const container = document.getElementById("dynamicFormFields");
-            container.innerHTML = "";
+        /* ===================== Browse & Manage Mode ===================== */
+        function onBrowseTableChange() {
+            const target = document.getElementById("browseTarget").value;
+            document.getElementById("browseTableIcon").textContent = tableIcons[target] || "📄";
+            document.getElementById("browseSearch").value = "";
+            loadBrowseData();
+        }
 
-            tableFields[target].forEach(field => {
-                container.innerHTML += `
-                    <div>
-                        <label>${field}</label>
-                        <input type="text" id="ins_${field}" placeholder="Enter ${field}">
-                    </div>
-                `;
+        function loadBrowseData() {
+            const target = document.getElementById("browseTarget").value;
+            document.getElementById("browseBody").innerHTML = "<tr><td>Loading...</td></tr>";
+
+            if (target === "loans") {
+                Promise.all([
+                    fetch("/loans").then(r => r.json()),
+                    fetch("/loan_history").then(r => r.json())
+                ]).then(([loans, history]) => {
+                    currentBrowseData = loans.map(loan => {
+                        const h = history.find(x => x.loan_id === loan.loan_id);
+                        return { ...loan, return_status: h ? h.return_status : "Unknown" };
+                    });
+                    renderBrowseTable();
+                });
+            } else {
+                fetch(`/${target}`)
+                .then(res => res.json())
+                .then(data => {
+                    currentBrowseData = data;
+                    renderBrowseTable();
+                });
+            }
+        }
+
+        function renderBrowseTable() {
+            const target = document.getElementById("browseTarget").value;
+            const search = document.getElementById("browseSearch").value.trim().toLowerCase();
+            const thead = document.getElementById("browseHeaders");
+            const tbody = document.getElementById("browseBody");
+
+            let rows = currentBrowseData;
+            if (search) {
+                rows = rows.filter(row =>
+                    Object.values(row).some(v => v !== null && String(v).toLowerCase().includes(search))
+                );
+            }
+
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            if (rows.length === 0) {
+                thead.innerHTML = "<th>No Data</th>";
+                tbody.innerHTML = `<tr><td style="color: var(--danger);">No matching records found.</td></tr>`;
+                return;
+            }
+
+            const keys = Object.keys(rows[0]);
+            keys.forEach(k => thead.innerHTML += `<th>${k}</th>`);
+            thead.innerHTML += `<th>Actions</th>`;
+
+            const pk = primaryKeys[target];
+            const canEdit = !!pk;
+
+            rows.forEach(row => {
+                let tr = "<tr>";
+                keys.forEach(k => tr += `<td>${row[k] !== null && row[k] !== undefined ? escapeHtml(String(row[k])) : ''}</td>`);
+
+                let actions = "";
+                if (target === "loans" && row.return_status === "Active") {
+                    actions += `<button type="button" class="row-action-btn row-return" title="Mark as Returned" onclick="toggleLoanStatus(${row.loan_id})">↩️</button>`;
+                }
+                if (canEdit) {
+                    actions += `<button type="button" class="row-action-btn row-edit" title="Edit" onclick="openEditModal('${target}', ${row[pk]})">✏️</button>`;
+                }
+                const deleteId = target === "authors_list" || target === "loan_history" ? row.book_id ?? row.loan_id : row[pk || Object.keys(row)[0]];
+                actions += `<button type="button" class="row-action-btn row-delete" title="Delete" onclick="deleteBrowseRow('${target}', ${target === 'loan_history' ? row.loan_id : (pk ? row[pk] : row.book_id)})">🗑️</button>`;
+
+                tr += `<td>${actions}</td></tr>`;
+                tbody.innerHTML += tr;
             });
         }
 
-        function submitGenericInsert() {
-            const target = document.getElementById("insertTarget").value;
-            const fields = tableFields[target];
-            let payload = {};
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+        }
 
+        function toggleLoanStatus(loanId) {
+            fetch(`/loans/${loanId}/return`, { method: "PUT" })
+            .then(async res => {
+                const resJson = await res.json();
+                showBrowseMessage(res.ok, res.ok ? resJson.message : (resJson.detail || "Failed to update status."));
+                if (res.ok) { loadActivities(); loadBrowseData(); }
+            });
+        }
+
+        function deleteBrowseRow(table, id) {
+            if (!confirm("Are you sure you want to delete this record?")) return;
+            fetch(`/${table}/${id}`, { method: "DELETE" })
+            .then(async res => {
+                const resJson = await res.json();
+                showBrowseMessage(res.ok, res.ok ? resJson.message : (resJson.detail || "Delete failed."));
+                if (res.ok) { loadActivities(); loadBrowseData(); }
+            });
+        }
+
+        function showBrowseMessage(success, text) {
+            const msgDiv = document.getElementById("browseMessage");
+            msgDiv.style.display = "block";
+            msgDiv.className = success ? "result success-msg" : "result error-msg";
+            msgDiv.innerText = text;
+            setTimeout(() => { msgDiv.style.display = "none"; }, 5000);
+        }
+
+        /* ===================== Export / Import ===================== */
+        function downloadExport() {
+            window.location.href = "/export/excel";
+        }
+
+        function triggerImportFile() {
+            document.getElementById("browseImportFile").click();
+        }
+
+        function handleImportFileChosen() {
+            const target = document.getElementById("browseTarget").value;
+            const fileInput = document.getElementById("browseImportFile");
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch(`/import/${target}`, { method: "POST", body: formData })
+            .then(async res => {
+                const resJson = await res.json();
+                if (res.ok) {
+                    let text = `Imported ${resJson.inserted} record(s).`;
+                    if (resJson.failed_count > 0) {
+                        text += ` ${resJson.failed_count} failed — ` +
+                            resJson.failures.map(f => `Row ${f.row}: ${f.error}`).join(" | ");
+                    }
+                    showBrowseMessage(resJson.failed_count === 0, text);
+                    loadActivities();
+                    loadBrowseData();
+                } else {
+                    showBrowseMessage(false, "Import failed: " + (resJson.detail || "Check file format."));
+                }
+                fileInput.value = "";
+            });
+        }
+
+        /* ===================== Add / Edit Modal ===================== */
+        function openAddModal() {
+            const target = document.getElementById("browseTarget").value;
+            modalMode = "add";
+            modalTable = target;
+            modalEditId = null;
+
+            document.getElementById("modalTitle").textContent = `➕ Add New ${target.replace('_', ' ')}`;
+            document.getElementById("modalMessage").style.display = "none";
+
+            let fields = tableFields[target];
+            // بالإضافة، ما نطلب loan_id لأنه يُنشأ تلقائيًا
+            if (target === "loans") fields = fields.filter(f => f !== "loan_id");
+
+            const container = document.getElementById("modalFormFields");
+            container.innerHTML = "";
             fields.forEach(field => {
-                let val = document.getElementById(`ins_${field}`).value.trim();
-                if (!isNaN(val) && val !== "") {
+                let defaultVal = "";
+                if (target === "loans" && field === "loan_date") defaultVal = new Date().toISOString().split("T")[0];
+                if (target === "loans" && field === "due_date") {
+                    const d = new Date(); d.setDate(d.getDate() + 14);
+                    defaultVal = d.toISOString().split("T")[0];
+                }
+                const inputType = (field.includes("date")) ? "date" : "text";
+                container.innerHTML += `
+                    <div>
+                        <label>${field}</label>
+                        <input type="${inputType}" id="modal_${field}" value="${defaultVal}" placeholder="Enter ${field}">
+                    </div>
+                `;
+            });
+
+            document.getElementById("recordModal").style.display = "flex";
+        }
+
+        function openEditModal(table, id) {
+            const pk = primaryKeys[table];
+            const row = currentBrowseData.find(r => r[pk] === id);
+            if (!row) { alert("Record not found in the current view."); return; }
+
+            modalMode = "edit";
+            modalTable = table;
+            modalEditId = id;
+
+            document.getElementById("modalTitle").textContent = `✏️ Edit ${table.replace('_', ' ')} — ${pk}: ${id}`;
+            document.getElementById("modalMessage").style.display = "none";
+
+            const fields = tableFields[table];
+            const container = document.getElementById("modalFormFields");
+            container.innerHTML = "";
+            fields.forEach(field => {
+                const isPk = field === pk;
+                const inputType = (field.includes("date")) ? "date" : "text";
+                const val = row[field] !== null && row[field] !== undefined ? row[field] : "";
+                container.innerHTML += `
+                    <div>
+                        <label>${field}${isPk ? " (read-only)" : ""}</label>
+                        <input type="${inputType}" id="modal_${field}" value="${val}" ${isPk ? "disabled style='background:#f1f5f9;color:#94a3b8;'" : ""}>
+                    </div>
+                `;
+            });
+
+            document.getElementById("recordModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("recordModal").style.display = "none";
+        }
+
+        function submitModalForm() {
+            const fields = modalTable === "loans" && modalMode === "add"
+                ? tableFields["loans"].filter(f => f !== "loan_id")
+                : tableFields[modalTable];
+
+            let payload = {};
+            fields.forEach(field => {
+                const el = document.getElementById(`modal_${field}`);
+                if (!el || el.disabled) return;
+                let val = el.value.trim();
+                if (val !== "" && !isNaN(val) && !field.includes("date")) {
                     payload[field] = val.includes(".") ? parseFloat(val) : parseInt(val);
                 } else {
                     payload[field] = val;
                 }
             });
 
-            const msgDiv = document.getElementById("insertMessage");
+            const msgDiv = document.getElementById("modalMessage");
+            const url = modalMode === "add" ? `/${modalTable}` : `/${modalTable}/${modalEditId}`;
+            const method = modalMode === "add" ? "POST" : "PUT";
 
-            fetch(`/${target}`, {
-                method: "POST",
+            fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
@@ -531,75 +785,18 @@
                 msgDiv.style.display = "block";
                 if (response.ok) {
                     msgDiv.className = "result success-msg";
-                    msgDiv.innerText = "Record added successfully!";
+                    msgDiv.innerText = modalMode === "add" ? "Record added successfully!" : "Record updated successfully!";
                     loadActivities();
-                    executeAdvancedQuery();
+                    loadBrowseData();
+                    setTimeout(closeModal, 900);
                 } else {
                     msgDiv.className = "result error-msg";
-                    msgDiv.innerText = "Insertion failed: " + (resJson.detail || "Check inputs.");
+                    msgDiv.innerText = "Failed: " + (resJson.detail || "Check inputs.");
                 }
             });
         }
 
-        function submitNewLoan() {
-            const payload = {
-                loan_date: document.getElementById("loan_date").value,
-                due_date: document.getElementById("due_date").value,
-                student_id: parseInt(document.getElementById("loan_student_id").value),
-                employee_id: parseInt(document.getElementById("loan_employee_id").value),
-                book_id: parseInt(document.getElementById("loan_book_id").value)
-            };
-
-            const msgDiv = document.getElementById("loanMessage");
-
-            fetch("/loans", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
-            .then(async res => {
-                const resJson = await res.json();
-                msgDiv.style.display = "block";
-                if (res.ok) {
-                    msgDiv.className = "result success-msg";
-                    msgDiv.innerText = "Loan registered successfully with Auto ID: " + resJson.loan_id;
-                    loadActivities();
-                    executeAdvancedQuery();
-                } else {
-                    msgDiv.className = "result error-msg";
-                    msgDiv.innerText = "Loan registration failed: " + (resJson.detail || "Verify data.");
-                }
-            });
-        }
-
-        function submitReturnLoan() {
-            const loanId = document.getElementById("return_loan_id").value;
-            const msgDiv = document.getElementById("returnMessage");
-
-            if (!loanId) {
-                msgDiv.style.display = "block";
-                msgDiv.className = "result error-msg";
-                msgDiv.innerText = "Please enter a Loan ID.";
-                return;
-            }
-
-            fetch(`/loans/${loanId}/return`, { method: "PUT" })
-            .then(async res => {
-                const resJson = await res.json();
-                msgDiv.style.display = "block";
-                if (res.ok) {
-                    msgDiv.className = "result success-msg";
-                    msgDiv.innerText = resJson.message;
-                    document.getElementById("return_loan_id").value = "";
-                    loadActivities();
-                    executeAdvancedQuery();
-                } else {
-                    msgDiv.className = "result error-msg";
-                    msgDiv.innerText = "Return failed: " + (resJson.detail || "Loan not found.");
-                }
-            });
-        }
-
+        /* ===================== Activity Log ===================== */
         function loadActivities() {
             fetch("/activities")
             .then(res => res.json())
@@ -609,37 +806,6 @@
                 data.slice().reverse().forEach(act => {
                     logBox.innerHTML += `<div>⏱️ [${act.time}] - ${act.action}</div>`;
                 });
-            });
-        }
-
-        function executeDelete() {
-            const target = document.getElementById("deleteTarget").value;
-            const id = document.getElementById("deleteId").value.trim();
-            const msgDiv = document.getElementById("deleteMessage");
-
-            if (!id) {
-                msgDiv.style.display = "block";
-                msgDiv.className = "result error-msg";
-                msgDiv.innerText = "Please enter the target identifier (ID).";
-                return;
-            }
-
-            if (!confirm("Are you sure you want to delete this record?")) return;
-
-            fetch(`/${target}/${id}`, { method: "DELETE" })
-            .then(async response => {
-                const resJson = await response.json();
-                msgDiv.style.display = "block";
-                if (response.ok) {
-                    msgDiv.className = "result success-msg";
-                    msgDiv.innerText = resJson.message;
-                    document.getElementById("deleteId").value = "";
-                    executeAdvancedQuery();
-                    loadActivities();
-                } else {
-                    msgDiv.className = "result error-msg";
-                    msgDiv.innerText = "Deletion failed: " + (resJson.detail || "Record not found.");
-                }
             });
         }
     </script>
