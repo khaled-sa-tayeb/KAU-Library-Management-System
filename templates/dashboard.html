@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAU Library Management System</title>
+    <title>KAU Advanced Library Management System</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
@@ -16,10 +16,13 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --bg-main: #f1f5f9;
-            --card-bg: rgba(255, 255, 255, 0.94);
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
+            --card-bg: rgba(255, 255, 255, 0.42);
+            --glass-border: rgba(255, 255, 255, 0.55);
+            --glass-blur: blur(22px) saturate(180%);
+            --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --border-color: rgba(203, 213, 225, 0.6);
             --radius: 14px;
             --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
@@ -40,13 +43,15 @@
         .container { max-width: 1200px; margin: auto; }
 
         .header-banner {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.55) 0%, rgba(30, 41, 59, 0.55) 100%);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             color: white;
             padding: 30px 40px;
             border-radius: var(--radius);
             margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--glass-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -77,12 +82,13 @@
 
         .section-box {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             padding: 30px;
             margin-bottom: 25px;
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--glass-shadow);
         }
 
         .section-box h3 {
@@ -114,8 +120,10 @@
         input, select {
             width: 100%;
             padding: 11px 14px;
-            background-color: #ffffff;
-            border: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid var(--glass-border);
             border-radius: 8px;
             box-sizing: border-box;
             font-family: 'Cairo', sans-serif;
@@ -127,6 +135,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.92);
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
@@ -163,48 +172,61 @@
 
         .table-container {
             max-height: 400px; overflow-y: auto; margin-top: 15px;
-            border: 1px solid var(--border-color); border-radius: 8px; background: white;
+            border: 1px solid var(--glass-border); border-radius: 8px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
         th, td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
         th {
-            background-color: #f8fafc; color: var(--primary); font-weight: 700;
+            background-color: rgba(248, 250, 252, 0.85); color: var(--primary); font-weight: 700;
             position: sticky; top: 0; z-index: 10;
         }
-        tr:hover td { background-color: #f1f5f9; }
+        tr:hover td { background-color: rgba(241, 245, 249, 0.9); }
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; }
 
         .activity-log {
-            background: #ffffff; border: 1px solid var(--border-color); color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); color: var(--text-main);
             padding: 12px; border-radius: 8px; font-size: 13px; max-height: 130px;
             overflow-y: auto; font-family: monospace;
         }
 
         .sub-panel {
-            background: rgba(241, 245, 249, 0.7); padding: 18px; border-radius: 8px;
-            border: 1px solid var(--border-color); margin-top: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            padding: 18px; border-radius: 8px;
+            border: 1px solid var(--glass-border); margin-top: 15px;
         }
 
         /* ===== Mode Tabs ===== */
         .mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
         .mode-tab {
             width: auto; flex: 1; margin-top: 0;
-            background: #e2e8f0; color: var(--text-muted);
+            background: rgba(226, 232, 240, 0.5); color: var(--text-muted);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             box-shadow: none; font-size: 14px;
         }
-        .mode-tab:hover { background: #cbd5e1; transform: none; }
+        .mode-tab:hover { background: rgba(203, 213, 225, 0.7); transform: none; }
         .mode-tab.active { background: var(--primary); color: white; }
         .mode-tab.active:hover { background: var(--primary-light); }
 
         /* ===== Browse Toolbar ===== */
         .browse-toolbar {
             display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-            background: rgba(241, 245, 249, 0.7); padding: 14px 16px; border-radius: 10px;
-            border: 1px solid var(--border-color); margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            padding: 14px 16px; border-radius: 10px;
+            border: 1px solid var(--glass-border); margin-bottom: 4px;
         }
         .browse-table-select { display: flex; align-items: center; gap: 8px; min-width: 200px; }
         .table-icon { font-size: 24px; line-height: 1; flex-shrink: 0; }
@@ -216,10 +238,12 @@
             width: 42px; height: 42px; padding: 0; margin: 0;
             display: flex; align-items: center; justify-content: center;
             font-size: 19px; border-radius: 8px; flex-shrink: 0;
-            background: white; color: var(--primary); border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            color: var(--primary); border: 1px solid var(--glass-border);
             box-shadow: none;
         }
-        .icon-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.8); transform: translateY(-1px); }
         .icon-btn.btn-add { background: var(--success); color: white; border-color: var(--success); }
         .icon-btn.btn-add:hover { background: #059669; }
 
@@ -244,14 +268,19 @@
 
         /* ===== Modal ===== */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45);
             display: flex; align-items: center; justify-content: center;
-            z-index: 1000; padding: 20px; backdrop-filter: blur(3px);
+            z-index: 1000; padding: 20px; backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
         .modal-box {
-            background: white; border-radius: var(--radius); padding: 28px 30px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius); padding: 28px 30px;
             max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+            box-shadow: var(--glass-shadow);
         }
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
