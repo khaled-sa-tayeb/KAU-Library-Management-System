@@ -1,12 +1,15 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
+from io import BytesIO
 import sqlite3
 import os
 import uvicorn
 import webbrowser
+import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "library.db")
@@ -18,8 +21,11 @@ with open(os.path.join(TEMPLATES_DIR, "dashboard.html"), "r", encoding="utf-8") 
 app = FastAPI(
     title="KAU Library Management System",
     description="Comprehensive University Library Management System with Modern UI, backed by a real SQLite database.",
-    version="4.0.0"
+    version="5.0.0"
 )
+
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # ==================== 1. Pydantic Models (with business-rule validation) ====================
 
@@ -94,7 +100,6 @@ def get_connection():
 
 
 def friendly_integrity_error(e: sqlite3.IntegrityError) -> str:
-    """يترجم أخطاء SQLite التقنية لرسائل مفهومة للمستخدم."""
     msg = str(e)
     if "UNIQUE constraint failed: Section.manager_id" in msg:
         return "This employee already manages another section. A manager can only manage one section."
@@ -201,8 +206,7 @@ def init_db():
 
 
 def seed_data(conn):
-    """يعبّي البيانات الأولية (نفس بيانات ملحق التقرير) أول مرة بس، عشان تصير قاعدة بيانات
-    حقيقية جاهزة للعرض من أول تشغيل."""
+ 
     cur = conn.cursor()
 
     cur.executemany(
@@ -594,6 +598,108 @@ def add_author(item: AuthorsList):
     return item
 
 
+# --- Excel Export & Import ---
+
+TABLE_SQL_NAME = {
+    "students": "Student",
+    "books": "Book",
+    "employees": "Employee",
+    "loans": "Loan",
+    "genres": "Genre",
+    "bookshelves": "Bookshelf",
+    "sections": "Section",
+    "loan_history": "Loan_History",
+    "authors_list": "Authors_List",
+}
+
+TABLE_CONFIG = {
+    "students": (Student, add_student),
+    "books": (Book, add_book),
+    "employees": (Employee, add_employee),
+    "loans": (Loan, add_loan),
+    "genres": (Genre, add_genre),
+    "bookshelves": (Bookshelf, add_bookshelf),
+    "sections": (Section, add_section),
+    "loan_history": (LoanHistory, add_loan_history),
+    "authors_list": (AuthorsList, add_author),
+}
+
+
+@app.get("/export/excel")
+def export_excel():
+
+    conn = get_connection()
+    output = BytesIO()
+
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        for table_key, sql_name in TABLE_SQL_NAME.items():
+            df = pd.read_sql_query(f"SELECT * FROM {sql_name}", conn)
+            df.to_excel(writer, sheet_name=table_key[:31], index=False)
+
+    conn.close()
+    output.seek(0)
+
+    filename = f"KAU_Library_Export_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": "Exported full database to Excel."})
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+def _clean_excel_value(v):
+    """يحوّل أرقام الأعمدة اللي تطلع Float من الإكسل (مثلاً 2245343.0) لأرقام صحيحة، ويحول NaN لـ None."""
+    if isinstance(v, float):
+        if pd.isna(v):
+            return None
+        if v.is_integer():
+            return int(v)
+    return v
+
+
+@app.post("/import/{table}")
+async def import_excel(table: str, file: UploadFile = File(...)):
+
+    if table not in TABLE_CONFIG:
+        raise HTTPException(status_code=400, detail=f"Unknown table: {table}")
+
+    model_cls, add_func = TABLE_CONFIG[table]
+
+    try:
+        contents = await file.read()
+        df = pd.read_excel(BytesIO(contents))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not read the Excel file: {e}")
+
+    inserted = 0
+    failures = []
+
+    for i, row in df.iterrows():
+        row_dict = {k: _clean_excel_value(v) for k, v in row.to_dict().items()}
+        excel_row_number = i + 2  # +2: نعوض صف العناوين ونبدأ العد من 1 مثل إكسل
+
+        try:
+            item = model_cls(**row_dict)
+            add_func(item)
+            inserted += 1
+        except HTTPException as e:
+            failures.append({"row": excel_row_number, "error": e.detail})
+        except Exception as e:
+            msg = str(e).split("\n")[0] if "\n" not in str(e) else " | ".join(
+                line.strip() for line in str(e).split("\n") if line.strip() and "https://" not in line
+            )
+            failures.append({"row": excel_row_number, "error": msg})
+
+    recent_activities.append({
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "action": f"Imported {inserted} record(s) into '{table}' from Excel ({len(failures)} failed)."
+    })
+
+    return {"inserted": inserted, "failed_count": len(failures), "failures": failures[:20]}
+
+
 # --- DELETE Endpoints ---
 
 @app.delete("/students/{student_id}")
@@ -650,8 +756,7 @@ def delete_loan(loan_id: int):
 
 @app.put("/loans/{loan_id}/return")
 def return_loan(loan_id: int):
-    """يسجل إرجاع الكتاب: يحدّث حالة القرض في Loan History إلى 'Returned'،
-    وبكذا يصير الكتاب متاح للاستعارة مرة ثانية ويقل عدد القروض النشطة للطالب."""
+
     conn = get_connection()
     row = conn.execute("SELECT * FROM Loan_History WHERE loan_id = ?", (loan_id,)).fetchone()
     if not row:
@@ -681,10 +786,121 @@ def delete_author(book_id: int):
     return {"message": f"Author record for book {book_id} deleted successfully."}
 
 
+@app.delete("/genres/{genre_code}")
+def delete_genre(genre_code: int):
+    conn = get_connection()
+    cur = conn.execute("DELETE FROM Genre WHERE genre_code = ?", (genre_code,))
+    conn.commit()
+    found = cur.rowcount > 0
+    conn.close()
+    if not found:
+        raise HTTPException(status_code=404, detail="Genre not found.")
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Deleted genre code: {genre_code}"})
+    return {"message": f"Genre {genre_code} deleted successfully."}
+
+
+@app.delete("/bookshelves/{bookshelf_id}")
+def delete_bookshelf(bookshelf_id: int):
+    conn = get_connection()
+    cur = conn.execute("DELETE FROM Bookshelf WHERE bookshelf_id = ?", (bookshelf_id,))
+    conn.commit()
+    found = cur.rowcount > 0
+    conn.close()
+    if not found:
+        raise HTTPException(status_code=404, detail="Bookshelf not found.")
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Deleted bookshelf ID: {bookshelf_id}"})
+    return {"message": f"Bookshelf {bookshelf_id} deleted successfully."}
+
+
+@app.delete("/sections/{section_id}")
+def delete_section(section_id: int):
+    conn = get_connection()
+    cur = conn.execute("DELETE FROM Section WHERE section_id = ?", (section_id,))
+    conn.commit()
+    found = cur.rowcount > 0
+    conn.close()
+    if not found:
+        raise HTTPException(status_code=404, detail="Section not found.")
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Deleted section ID: {section_id}"})
+    return {"message": f"Section {section_id} deleted successfully."}
+
+
+@app.delete("/loan_history/{loan_id}")
+def delete_loan_history(loan_id: int):
+    conn = get_connection()
+    cur = conn.execute("DELETE FROM Loan_History WHERE loan_id = ?", (loan_id,))
+    conn.commit()
+    found = cur.rowcount > 0
+    conn.close()
+    if not found:
+        raise HTTPException(status_code=404, detail="Loan history record not found.")
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Deleted loan history for loan ID: {loan_id}"})
+    return {"message": f"Loan history record for loan {loan_id} deleted successfully."}
+
+
+
+UPDATABLE_TABLES = {
+    "students": ("Student", "student_id", Student),
+    "books": ("Book", "book_id", Book),
+    "employees": ("Employee", "employee_id", Employee),
+    "loans": ("Loan", "loan_id", Loan),
+    "genres": ("Genre", "genre_code", Genre),
+    "bookshelves": ("Bookshelf", "bookshelf_id", Bookshelf),
+    "sections": ("Section", "section_id", Section),
+}
+
+
+@app.put("/{table}/{record_id}")
+def update_record(table: str, record_id: int, payload: dict):
+    if table not in UPDATABLE_TABLES:
+        raise HTTPException(status_code=400, detail=f"Table '{table}' does not support editing here.")
+
+    sql_name, pk_col, model_cls = UPDATABLE_TABLES[table]
+    allowed_fields = model_cls.model_fields.keys()
+    clean_payload = {k: v for k, v in payload.items() if k in allowed_fields and k != pk_col}
+
+    if not clean_payload:
+        raise HTTPException(status_code=400, detail="No valid fields provided to update.")
+
+    conn = get_connection()
+
+    # نجيب الصف الحالي كامل، وندمجه مع التعديلات المطلوبة، عشان نتحقق من سجل كامل
+    # صحيح (مو بس الحقول اللي تغيّرت) — وإلا أي تعديل جزئي بيفشل بخطأ "حقل مفقود" بالغلط.
+    existing = conn.execute(f"SELECT * FROM {sql_name} WHERE {pk_col} = ?", (record_id,)).fetchone()
+    if not existing:
+        conn.close()
+        raise HTTPException(status_code=404, detail=f"Record with {pk_col}={record_id} not found.")
+
+    merged = {**dict(existing), **clean_payload, pk_col: record_id}
+
+    try:
+        model_cls(**merged)
+    except Exception as e:
+        conn.close()
+        msg = str(e).split("\n")[0] if "\n" not in str(e) else " | ".join(
+            line.strip() for line in str(e).split("\n") if line.strip() and "https://" not in line
+        )
+        raise HTTPException(status_code=400, detail=msg)
+
+    set_clause = ", ".join(f"{k} = ?" for k in clean_payload.keys())
+    values = list(clean_payload.values()) + [record_id]
+
+    try:
+        conn.execute(f"UPDATE {sql_name} SET {set_clause} WHERE {pk_col} = ?", values)
+        conn.commit()
+    except sqlite3.IntegrityError as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=400, detail=friendly_integrity_error(e))
+    conn.close()
+
+    recent_activities.append({"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "action": f"Updated {table} record ID: {record_id}"})
+    return {"message": "Record updated successfully.", pk_col: record_id, **clean_payload}
+
+
 # ==================== 5. Application Execution ====================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    # نفتح المتصفح تلقائيًا بس وقت التشغيل المحلي، مو وقت النشر على سيرفر (Render/Railway...)
     if not os.environ.get("RENDER") and not os.environ.get("PORT"):
         try:
             webbrowser.open(f"http://127.0.0.1:{port}/")
